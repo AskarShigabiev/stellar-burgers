@@ -11,8 +11,7 @@ import { RootState } from '../store';
 export type TConstructorState = {
   bun: TConstructorIngredient | null;
   ingredients: TConstructorIngredient[];
-  error: string | null;
-  isLoading: boolean;
+  error?: string | null;
   orderModalData: TOrder | null;
 };
 
@@ -20,18 +19,8 @@ export const initialState: TConstructorState = {
   bun: null,
   ingredients: [],
   error: null,
-  isLoading: false,
   orderModalData: null
 };
-
-// создание заказа
-export const createOrder = createAsyncThunk(
-  'orders/createOrder',
-  async (ingredients: string[]) => {
-    const response = await orderBurgerApi(ingredients);
-    return response.order;
-  }
-);
 
 export const constructorSlice = createSlice({
   name: 'constructorBurger',
@@ -61,48 +50,24 @@ export const constructorSlice = createSlice({
         state.ingredients.splice(newIndex, 0, movedIngredient);
       }
     },
-    setOrderModalData: (state, action: PayloadAction<TOrder | null>) => {
-      if (!action.payload) {
-        state.bun = null;
-        state.ingredients = [];
-      }
-      state.orderModalData = action.payload;
+    clearIngredients: (state) => {
+      state.ingredients = [];
+      state.bun = null;
     }
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(createOrder.pending, (state) => {
-        state.error = null;
-        state.isLoading = true;
-      })
-      .addCase(createOrder.rejected, (state, action) => {
-        state.error = action.error.message || '';
-        state.isLoading = false;
-      })
-      .addCase(createOrder.fulfilled, (state, action) => {
-        state.orderModalData = action.payload;
-        state.isLoading = false;
-        state.error = null;
-      });
   }
 });
-
-export const {
-  addIngredient,
-  removeIngredient,
-  moveIngredientPosition,
-  setOrderModalData
-} = constructorSlice.actions;
 
 export const selectConstructorState = (state: RootState) =>
   state.constructorBurger;
 export const selectIngredients = (state: RootState) =>
   state.constructorBurger.ingredients;
 export const selectBun = (state: RootState) => state.constructorBurger.bun;
-export const selectOrderModalData = (state: RootState) =>
-  state.constructorBurger.orderModalData;
-export const selectLoading = (state: RootState) =>
-  state.constructorBurger.isLoading;
-export const selectError = (state: RootState) => state.constructorBurger.error;
+
+export const {
+  addIngredient,
+  removeIngredient,
+  moveIngredientPosition,
+  clearIngredients
+} = constructorSlice.actions;
 
 export default constructorSlice.reducer;

@@ -10,19 +10,20 @@ import {
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { deleteCookie, setCookie } from '../../utils/cookie';
 import { TUser } from '@utils-types';
+import { RootState } from '../store';
 
 export interface TUserState {
-  user: TUser | null;
+  user?: TUser | null;
   isAuthChecked: boolean;
-  error: string;
+  error?: string;
   isLoading: boolean;
 }
 
-export const initialUserState: TUserState = {
+export const initialState: TUserState = {
   user: null,
   isAuthChecked: false,
-  error: '',
-  isLoading: false
+  isLoading: false,
+  error: ''
 };
 
 export const fetchCurrentUser = createAsyncThunk('user/getUser', async () => {
@@ -54,9 +55,10 @@ export const registerUser = createAsyncThunk(
 
 // выход пользователя
 export const logoutUser = createAsyncThunk('user/logout', async () => {
-  await logoutApi();
+  const response = await logoutApi();
   localStorage.removeItem('refreshToken');
   deleteCookie('accessToken');
+  return response;
 });
 
 // обновления данных пользователя
@@ -70,16 +72,18 @@ export const updateUserProfile = createAsyncThunk(
 
 export const userSlice = createSlice({
   name: 'user',
-  initialState: initialUserState,
+  initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchCurrentUser.pending, (state) => {
-        state.isLoading = true;
+        state.isAuthChecked = false;
         state.error = '';
+        state.isLoading = true;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
-        state.error = action.error?.message || '';
+        state.error = action.error?.message;
+        state.isAuthChecked = true;
         state.isLoading = false;
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
@@ -89,11 +93,13 @@ export const userSlice = createSlice({
       });
     builder
       .addCase(registerUser.pending, (state) => {
-        state.isLoading = true;
+        state.isAuthChecked = false;
         state.error = '';
+        state.isLoading = true;
       })
       .addCase(registerUser.rejected, (state, action) => {
-        state.error = action.error?.message || '';
+        state.error = action.error?.message;
+        state.isAuthChecked = true;
         state.isLoading = false;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
@@ -103,11 +109,13 @@ export const userSlice = createSlice({
       });
     builder
       .addCase(loginUser.pending, (state) => {
-        state.isLoading = true;
+        state.isAuthChecked = false;
         state.error = '';
+        state.isLoading = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
-        state.error = action.error?.message || '';
+        state.error = action.error?.message;
+        state.isAuthChecked = true;
         state.isLoading = false;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
@@ -117,37 +125,32 @@ export const userSlice = createSlice({
       });
     builder.addCase(logoutUser.fulfilled, (state) => {
       state.user = null;
-      state.isAuthChecked = false;
+      state.isAuthChecked = true;
       state.isLoading = false;
     });
     builder
       .addCase(updateUserProfile.pending, (state) => {
-        state.isLoading = true;
+        state.isAuthChecked = true;
         state.error = '';
+        state.isLoading = true;
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
-        state.error = action.error?.message || '';
+        state.error = action.error?.message;
+        state.isAuthChecked = true;
         state.isLoading = false;
       })
       .addCase(updateUserProfile.fulfilled, (state, action) => {
         state.user = action.payload.user;
-        state.isLoading = false;
         state.isAuthChecked = true;
+        state.isLoading = false;
       });
-  },
-  selectors: {
-    selectCurrentUser: (state: TUserState) => state.user,
-    selectAuthError: (state: TUserState) => state.error,
-    selectIsAuthChecked: (state: TUserState) => state.isAuthChecked,
-    selectUserisLoading: (state: TUserState) => state.isLoading
   }
 });
 
-export const {
-  selectCurrentUser,
-  selectAuthError,
-  selectIsAuthChecked,
-  selectUserisLoading
-} = userSlice.selectors;
+export const selectCurrentUser = (state: RootState) => state.user.user;
+export const selectAuthError = (state: RootState) => state.user.error;
+export const selectIsAuthChecked = (state: RootState) =>
+  state.user.isAuthChecked;
+export const selectUserLoading = (state: RootState) => state.user.isLoading;
 
 export default userSlice.reducer;

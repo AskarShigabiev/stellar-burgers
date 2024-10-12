@@ -3,7 +3,7 @@ import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient } from '@utils-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { getOrderById, selectCurrentOrder } from '../../services/slices/orderS';
+import { getOrderById, selectModalData } from '../../services/slices/orderS';
 import { useParams } from 'react-router-dom';
 import { selectIngredients } from '../../services/slices/ingredient';
 import { AppDispatch } from '../../services/store';
@@ -11,7 +11,7 @@ import { AppDispatch } from '../../services/store';
 export const OrderInfo: FC = () => {
   /** TODO: взять переменные orderData и ingredients из стора */
   const orderId = Number(useParams().id);
-  const orderData = useSelector(selectCurrentOrder);
+  const orderData = useSelector(selectModalData);
 
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {

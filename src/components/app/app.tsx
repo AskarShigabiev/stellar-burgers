@@ -34,7 +34,7 @@ const App = () => {
     if (token) {
       dispatch(fetchCurrentUser());
     }
-  }, [dispatch]);
+  }, []);
 
   return (
     <div className={styles.app}>
@@ -99,7 +99,7 @@ const App = () => {
             path='/feed/:number'
             element={
               <Modal
-                title={`Заказ #${order?.currentOrder?.number || ''}`}
+                title={`Заказ #${order?.orderModalData?.number || ''}`}
                 onClose={() => navigate(-1)}
               >
                 <OrderInfo />
@@ -119,7 +119,7 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <Modal
-                  title={`#${order?.currentOrder?.number || ''}`}
+                  title={`#${order?.orderModalData?.number || ''}`}
                   onClose={() => navigate(-1)}
                 >
                   <OrderInfo />

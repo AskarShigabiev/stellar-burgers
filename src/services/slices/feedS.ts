@@ -1,24 +1,23 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { TOrdersData } from '@utils-types';
+import { TOrder } from '@utils-types';
 import { getFeedsApi } from '../../utils/burger-api';
+import { RootState } from '../store';
 
 export type TFeedState = {
-  feed: TOrdersData;
-  isLoading: boolean;
-  error: string | null;
+  orders: TOrder[];
+  error?: string | null;
+  total: number;
+  totalToday: number;
 };
 
 export const initialState: TFeedState = {
-  feed: {
-    orders: [],
-    total: 0,
-    totalToday: 0
-  },
-  isLoading: false,
+  orders: [],
+  total: 0,
+  totalToday: 0,
   error: null
 };
 
-// получение данных фида
+// получение данных
 export const fetchFeedOrders = createAsyncThunk(
   'feed/fetchFeedOrders',
   async () => {
@@ -33,36 +32,21 @@ export const feedSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchFeedOrders.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
       .addCase(fetchFeedOrders.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.error.message as string;
+        state.orders = [];
+        state.error = action.error?.message;
       })
       .addCase(fetchFeedOrders.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.feed = action.payload;
+        state.orders = action.payload.orders;
+        state.totalToday = action.payload.totalToday;
+        state.total = action.payload.total;
       });
-  },
-  selectors: {
-    selectFeed: (state: TFeedState) => state.feed,
-    selectFeedOrders: (state: TFeedState) => state.feed.orders,
-    selectTotalOrders: (state: TFeedState) => state.feed.total,
-    selectTotalTodayOrders: (state: TFeedState) => state.feed.totalToday,
-    selectFeedLoading: (state: TFeedState) => state.isLoading,
-    selectFeedError: (state: TFeedState) => state.error
   }
 });
 
-export const {
-  selectFeed,
-  selectFeedOrders,
-  selectTotalOrders,
-  selectTotalTodayOrders,
-  selectFeedLoading,
-  selectFeedError
-} = feedSlice.selectors;
+export const selectFeed = (state: RootState) => state.feed.orders;
+export const selectTotal = (state: RootState) => state.feed.total;
+export const selectTotalToday = (state: RootState) => state.feed.totalToday;
+export const selectFeedError = (state: RootState) => state.feed.error;
 
 export default feedSlice.reducer;

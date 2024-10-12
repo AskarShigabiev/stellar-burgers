@@ -1,7 +1,11 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, useLocation } from 'react-router-dom';
-import { selectIsAuthChecked } from '../../services/slices/userS';
+import {
+  selectCurrentUser,
+  selectIsAuthChecked
+} from '../../services/slices/userS';
+import { Preloader } from '@ui';
 
 type TProtectedRouteProps = {
   onlyUnAuth?: boolean;
@@ -9,17 +13,22 @@ type TProtectedRouteProps = {
 };
 
 export const ProtectedRoute = ({
-  onlyUnAuth = false,
+  onlyUnAuth,
   children
 }: TProtectedRouteProps) => {
   const location = useLocation();
-  const isAuthChecked = useSelector(selectIsAuthChecked);
+  // const isAuthChecked = useSelector(selectIsAuthChecked);
+  const user = useSelector(selectCurrentUser);
 
-  if (!isAuthChecked && !onlyUnAuth) {
+  // if (!isAuthChecked) {
+  //   return <Preloader />;
+  // }
+
+  if (!onlyUnAuth && !user) {
     return <Navigate replace to='/login' state={{ from: location }} />;
   }
 
-  if (isAuthChecked && onlyUnAuth) {
+  if (onlyUnAuth && user) {
     const from = location.state?.from || { pathname: '/' };
     return <Navigate replace to={from} />;
   }
