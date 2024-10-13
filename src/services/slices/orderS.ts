@@ -67,14 +67,6 @@ export const orderSlice = createSlice({
     builder.addCase(fetchOrders.fulfilled, (state, action) => {
       state.orders = action.payload;
     });
-    // .addCase(fetchOrders.rejected, (state, action) => {
-    //   state.loading = false;
-    //   state.error = action.error?.message || null;
-    // })
-    // .addCase(fetchOrders.pending, (state) => {
-    //   state.loading = true;
-    //   state.error = null;
-    // })
     builder
       .addCase(getOrderById.fulfilled, (state, action) => {
         state.orderModalData = action.payload.orders[0];

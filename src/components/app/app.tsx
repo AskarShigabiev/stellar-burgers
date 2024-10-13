@@ -91,6 +91,16 @@ const App = () => {
           }
         />
         <Route path='*' element={<NotFound404 />} />
+        <Route path='/ingredients/:id' element={<IngredientDetails />} />
+        <Route path='/feed/:number' element={<OrderInfo />} />
+        <Route
+          path='/profile/orders/:number'
+          element={
+            <ProtectedRoute>
+              <OrderInfo />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
 
       {backgroundLocation && (
@@ -99,7 +109,7 @@ const App = () => {
             path='/feed/:number'
             element={
               <Modal
-                title={`Заказ #${order?.orderModalData?.number || ''}`}
+                title={`#${order?.orderModalData?.number || ''}`}
                 onClose={() => navigate(-1)}
               >
                 <OrderInfo />
