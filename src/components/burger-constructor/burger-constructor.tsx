@@ -1,24 +1,58 @@
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import { TConstructorIngredient } from '@utils-types';
+import { useSelector, useDispatch } from '../../services/store';
 import { BurgerConstructorUI } from '@ui';
+import { useNavigate } from 'react-router-dom';
+import {
+  selectCurrentUser,
+  selectIsAuthChecked
+} from '../../services/slices/userS';
+import {
+  clearIngredients,
+  selectConstructorState
+} from '../../services/slices/constructor';
+import {
+  closeModal,
+  createOrder,
+  selectModalData,
+  selectOrderRequest
+} from '../../services/slices/orderS';
 
 export const BurgerConstructor: FC = () => {
   /** TODO: взять переменные constructorItems, orderRequest и orderModalData из стора */
-  const constructorItems = {
-    bun: {
-      price: 0
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector(selectCurrentUser);
+  const constructorItems = useSelector(selectConstructorState);
+  const orderRequest = useSelector(selectOrderRequest);
+  const orderModalData = useSelector(selectModalData);
+
+  useEffect(
+    () => () => {
+      dispatch(closeModal());
     },
-    ingredients: []
-  };
-
-  const orderRequest = false;
-
-  const orderModalData = null;
+    [dispatch]
+  );
 
   const onOrderClick = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     if (!constructorItems.bun || orderRequest) return;
+    dispatch(
+      createOrder([
+        constructorItems.bun._id,
+        ...constructorItems.ingredients.map((i) => i._id),
+        constructorItems.bun._id
+      ])
+    );
   };
-  const closeOrderModal = () => {};
+
+  const closeOrderModal = () => {
+    dispatch(closeModal());
+    dispatch(clearIngredients());
+  };
 
   const price = useMemo(
     () =>
@@ -29,8 +63,6 @@ export const BurgerConstructor: FC = () => {
       ),
     [constructorItems]
   );
-
-  return null;
 
   return (
     <BurgerConstructorUI
