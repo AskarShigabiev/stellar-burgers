@@ -40,15 +40,12 @@ export const constructorSlice = createSlice({
         (ingredient) => ingredient.id !== action.payload
       );
     },
-    moveIngredientPosition: (
-      state,
-      action: PayloadAction<{ index: number; newIndex: number }>
-    ) => {
+    moveIngredientPosition: (state, action) => {
       const { index, newIndex } = action.payload;
-      if (index >= 0 && newIndex >= 0 && newIndex < state.ingredients.length) {
-        const [movedIngredient] = state.ingredients.splice(index, 1);
-        state.ingredients.splice(newIndex, 0, movedIngredient);
-      }
+      [state.ingredients[index], state.ingredients[index + newIndex]] = [
+        state.ingredients[index + newIndex],
+        state.ingredients[index]
+      ];
     },
     clearIngredients: (state) => {
       state.ingredients = [];
