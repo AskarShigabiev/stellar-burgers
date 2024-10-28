@@ -1,4 +1,7 @@
 const baseUrl = 'http://localhost:4000/#/';
+const meatIngredient = '[data-cy=643d69a5c3f7b9001cfa093f]';
+const cheeseIngredient = '[data-cy=643d69a5c3f7b9001cfa094a]';
+const modals = '#modals';
 
 // мокирование данных и перехват запроса
 beforeEach(() => {
@@ -40,9 +43,9 @@ describe('функционал конструктора бургера', functio
 
     it('добавить содержимое', function () {
         cy.get('[data-cy=empty-ingredients-list]').should('exist');
-        cy.get('[data-cy=643d69a5c3f7b9001cfa093f]').children('button').click(); // Добавляем мясо
+        cy.get(meatIngredient).children('button').click(); // Добавляем мясо
         cy.get('.constructor-element__row').contains('Мясо бессмертных моллюсков Protostomia');
-        cy.get('[data-cy=643d69a5c3f7b9001cfa094a]').children('button').click(); // Добавляем сыр
+        cy.get(cheeseIngredient).children('button').click(); // Добавляем сыр
         cy.get('.constructor-element__row').contains('Сыр с астероидной плесенью');
         cy.get('.constructor-element__row').should('have.length', 2);
     });
@@ -52,49 +55,49 @@ describe('работа модальных окон', function () {
     it('работа модального окна ингредиента', function () {
 
         // мясо
-        cy.get('#modals').should('be.empty');
-        cy.get('[data-cy=643d69a5c3f7b9001cfa093f]').children('a').click();
-        cy.get('#modals').should('be.not.empty');
-        cy.get('#modals').find('h3').contains('Мясо бессмертных моллюсков Protostomia');
-        cy.get('#modals').find('button').click();
-        cy.get('#modals').should('be.empty');
+        cy.get(modals).should('be.empty');
+        cy.get(meatIngredient).children('a').click();
+        cy.get(modals).should('be.not.empty');
+        cy.get(modals).find('h3').contains('Мясо бессмертных моллюсков Protostomia');
+        cy.get(modals).find('button').click();
+        cy.get(modals).should('be.empty');
 
         // сыр
-        cy.get('#modals').should('be.empty');
-        cy.get('[data-cy=643d69a5c3f7b9001cfa094a]').children('a').click();
-        cy.get('#modals').should('be.not.empty');
-        cy.get('#modals').find('h3').contains('Сыр с астероидной плесенью');
-        cy.get('#modals').find('button').click();
-        cy.get('#modals').should('be.empty');
+        cy.get(modals).should('be.empty');
+        cy.get(cheeseIngredient).children('a').click();
+        cy.get(modals).should('be.not.empty');
+        cy.get(modals).find('h3').contains('Сыр с астероидной плесенью');
+        cy.get(modals).find('button').click();
+        cy.get(modals).should('be.empty');
     });
 
     it('закртиые модального окна ингредиента(оверлей)', function () {
-        cy.get('#modals').should('be.empty');
-        cy.get('[data-cy=643d69a5c3f7b9001cfa093f]').children('a').click();
-        cy.get('#modals').should('be.not.empty');
+        cy.get(modals).should('be.empty');
+        cy.get(meatIngredient).children('a').click();
+        cy.get(modals).should('be.not.empty');
         cy.get('[data-cy=modal-overlay]').click({ force: true });
-        cy.get('#modals').should('be.empty');
+        cy.get(modals).should('be.empty');
 
-        cy.get('#modals').should('be.empty');
-        cy.get('[data-cy=643d69a5c3f7b9001cfa094a]').children('a').click();
-        cy.get('#modals').should('be.not.empty');
+        cy.get(modals).should('be.empty');
+        cy.get(cheeseIngredient).children('a').click();
+        cy.get(modals).should('be.not.empty');
         cy.get('[data-cy=modal-overlay]').click({ force: true });
-        cy.get('#modals').should('be.empty');
+        cy.get(modals).should('be.empty');
     });
 })
 
 describe('функционал создания заказа', function() {    
     it('создание и проверка заказа', function() {
         cy.get('[data-cy=643d69a5c3f7b9001cfa093c]').children('button').click();
-        cy.get('[data-cy=643d69a5c3f7b9001cfa093f]').children('button').click();
-        cy.get('[data-cy=643d69a5c3f7b9001cfa094a]').children('button').click();
+        cy.get(meatIngredient).children('button').click();
+        cy.get(cheeseIngredient).children('button').click();
 
         cy.get('[data-cy=order-button]').click();
         cy.wait('@userAuth');
         cy.wait('@createOrder');
 
-        cy.get('#modals').find('h2').contains('57706');
-        cy.get('#modals').find('button').click();
+        cy.get(modals).find('h2').contains('57706');
+        cy.get(modals).find('button').click();
 
         cy.get('.constructor-element__row').should('have.length', 0); 
     })
